@@ -76,7 +76,7 @@ public class SecondsKillApplicationTests {
 	@Test
 	public void StockOrderMapperInsertSelective() {
 		StockOrder order = new StockOrder();
-		order.setId(1);
+		order.setId(2);
 		order.setSid(1);
 		order.setName("苹果手机");
 		order.setCreateTime(new Date());
