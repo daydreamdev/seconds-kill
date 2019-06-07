@@ -24,7 +24,7 @@ public interface StockMapper {
     /**
      * 乐观锁 version
      */
-    @Update("UPDATE stock SET sale = sale + 1, version = version + 1 WHERE " +
+    @Update("UPDATE stock SET count = count - 1, sale = sale + 1, version = version + 1 WHERE " +
             "id = #{id, jdbcType = INTEGER} AND version = #{version, jdbcType = INTEGER}")
     int updateByOptimistic(Stock stock);
 }
