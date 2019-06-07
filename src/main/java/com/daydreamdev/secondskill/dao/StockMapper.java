@@ -12,4 +12,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface StockMapper {
 
+    Stock selectByPrimaryKey(int id);
+
+    int updateByPrimaryKeySelective(Stock stock);
 }

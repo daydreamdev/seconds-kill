@@ -1,7 +1,9 @@
 package com.daydreamdev.secondskill.service.impl;
 
+import com.daydreamdev.secondskill.dao.StockMapper;
 import com.daydreamdev.secondskill.pojo.Stock;
 import com.daydreamdev.secondskill.service.api.StockService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,18 +13,22 @@ import org.springframework.stereotype.Service;
 @Service(value = "StockService")
 public class StockServiceImpl implements StockService {
 
+    @Autowired
+    private StockMapper stockMapper;
+
     @Override
     public int getStockCount(int id) {
-        return 0;
+        Stock stock = stockMapper.selectByPrimaryKey(id);
+        return stock.getCount();
     }
 
     @Override
     public Stock getStockById(int id) {
-        return null;
+        return stockMapper.selectByPrimaryKey(id);
     }
 
     @Override
     public int updateStockById(Stock stock) {
-        return 0;
+        return stockMapper.updateByPrimaryKeySelective(stock);
     }
 }
