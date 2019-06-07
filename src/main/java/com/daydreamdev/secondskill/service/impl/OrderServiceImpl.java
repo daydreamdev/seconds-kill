@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 /**
  * @auther G.Fukang
  * @date 6/7 12:44
@@ -57,6 +59,7 @@ public class OrderServiceImpl implements OrderService{
         StockOrder order = new StockOrder();
         order.setSid(stock.getId());
         order.setName(stock.getName());
+        order.setCreateTime(new Date());
         int id = orderMapper.insertSelective(order);
         return id;
     }
