@@ -4,6 +4,7 @@ import com.daydreamdev.secondskill.pojo.Stock;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * @auther G.Fukang
@@ -12,7 +13,11 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface StockMapper {
 
-    Stock selectByPrimaryKey(int id);
+    @Select("SELECT * FROM stock WHERE id = #{id, jdbcType = INTEGER}")
+    Stock selectByPrimaryKey(@Param("id") int id);
 
+    @Update("UPDATE stock SET count = #{count, jdbcType = INTEGER}, name = #{name, jdbcType = VARCHAR}, " +
+            "sale = #{sale,jdbcType = INTEGER},version = #{version,jdbcType = INTEGER} " +
+            "WHERE id = #{id, jdbcType = INTEGER}")
     int updateByPrimaryKeySelective(Stock stock);
 }
