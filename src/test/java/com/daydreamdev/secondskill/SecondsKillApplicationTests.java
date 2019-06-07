@@ -14,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -44,6 +46,31 @@ public class SecondsKillApplicationTests {
 		stock.setVersion(0);
 		int res = stockMapper.updateByPrimaryKeySelective(stock);
 		Assert.assertEquals(res, 1);
+	}
+
+	@Test
+	public void StockMapperUpdateByOptimistic() {
+
+		class ThreadOrder implements Runnable {
+			@Override
+			public void run() {
+				Stock stock = new Stock();
+				stock.setId(1);
+				stock.setName("测试手机");
+				stock.setCount(10);
+				stock.setSale(5);
+				stock.setVersion(0);
+				int res = stockMapper.updateByOptimistic(stock);
+				System.out.println(res);
+				logger.info("res: " + res);
+			}
+		}
+
+		// 线程池
+		ExecutorService service = Executors.newFixedThreadPool(10);
+		for (int i = 0; i < 15; i++) {
+			service.submit(new ThreadOrder());
+		}
 	}
 
 	@Test

@@ -28,4 +28,9 @@ public interface StockService {
      * @return int
      */
     int updateStockById(Stock stock);
+
+    /**
+     * 乐观锁更新库存，解决超卖问题
+     */
+    int updateStockByOptimistic(Stock stock);
 }

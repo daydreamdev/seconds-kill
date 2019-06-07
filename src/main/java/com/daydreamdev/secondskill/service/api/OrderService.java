@@ -12,4 +12,11 @@ public interface OrderService {
      * @return int
      */
     int createWrongOrder(int sid);
+
+    /**
+     * 数据库乐观锁更新库存，解决超卖问题
+     * @param sid
+     * @return int
+     */
+    int createOptimisticOrder(int sid);
 }

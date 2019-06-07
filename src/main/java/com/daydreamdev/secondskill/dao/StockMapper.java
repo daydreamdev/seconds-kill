@@ -20,4 +20,8 @@ public interface StockMapper {
             "sale = #{sale,jdbcType = INTEGER},version = #{version,jdbcType = INTEGER} " +
             "WHERE id = #{id, jdbcType = INTEGER}")
     int updateByPrimaryKeySelective(Stock stock);
+
+    @Update("UPDATE stock SET sale = sale + 1, version = version + 1 WHERE" +
+            "id = #{id, jdbcType = INTEGER} AND version = #{version, jdbcType = INTEGER}")
+    int updateByOptimistic(Stock stock);
 }
