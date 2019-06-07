@@ -17,8 +17,6 @@ public class SecondsKillApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		Stock stock = stockMapper.findStockById(1);
-		System.out.println("name: " + stock.getName() + " count: " + stock.getCount() + " sale: " + stock.getSale());
 	}
 
 }

@@ -12,6 +12,4 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface StockMapper {
 
-    @Select("SELECT * FROM stock WHERE id = #{id}")
-    Stock findStockById(@Param("id") Integer id);
 }
