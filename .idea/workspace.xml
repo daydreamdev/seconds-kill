@@ -38,8 +38,8 @@
       <file leaf-file-name="OrderServiceImpl.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/service/impl/OrderServiceImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="411">
-              <caret line="69" column="54" lean-forward="true" selection-start-line="69" selection-start-column="54" selection-end-line="69" selection-end-column="54" />
+            <state relative-caret-position="423">
+              <caret line="128" column="37" lean-forward="false" selection-start-line="128" selection-start-column="37" selection-end-line="128" selection-end-column="37" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -47,12 +47,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="StockService.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/service/api/StockService.java">
+      <file leaf-file-name="RedisPoolUtil.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/utils/RedisPoolUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="393">
-              <caret line="22" column="31" lean-forward="true" selection-start-line="22" selection-start-column="31" selection-end-line="22" selection-end-column="31" />
-              <folding />
+            <state relative-caret-position="2907">
+              <caret line="118" column="50" lean-forward="false" selection-start-line="118" selection-start-column="50" selection-end-line="118" selection-end-column="50" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -119,12 +121,15 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OrderService.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/service/api/OrderService.java">
+      <file leaf-file-name="SecondsKillApplication.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/SecondsKillApplication.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="693">
-              <caret line="27" column="8" lean-forward="false" selection-start-line="27" selection-start-column="8" selection-end-line="27" selection-end-column="8" />
-              <folding />
+            <state relative-caret-position="378">
+              <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+              <folding>
+                <element signature="e#422#423#0" expanded="true" />
+                <element signature="e#486#487#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -132,7 +137,7 @@
       <file leaf-file-name="IndexController.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/controller/IndexController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
+            <state relative-caret-position="612">
               <caret line="101" column="41" lean-forward="true" selection-start-line="101" selection-start-column="41" selection-end-line="101" selection-end-column="41" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -154,6 +159,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>库存不足</find>
+      <find>checkStock</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -174,7 +180,6 @@
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/dao/OrderMapper.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/service/api/StockService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/service/impl/StockServiceImpl.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/SecondsKillApplication.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/druid/DruidStatViewServlet.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/druid/DruidStatFilter.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/daydreamdev/secondskill/SecondsKillApplicationTests.java" />
@@ -188,12 +193,13 @@
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/dao/StockMapper.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/Limit/RedisLimit.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/dao/StockOrderMapper.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/utils/RedisPoolUtil.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/service/api/OrderService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/RedisKeysConstant.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/RedisPreheatRunner.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/controller/IndexController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/SecondsKillApplication.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/utils/RedisPoolUtil.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/service/impl/OrderServiceImpl.java" />
       </list>
     </option>
@@ -311,6 +317,16 @@
               <item name="secondskill" type="462c0819:PsiDirectoryNode" />
               <item name="common" type="462c0819:PsiDirectoryNode" />
               <item name="Limit" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="seconds-kill" type="b2602c69:ProjectViewProjectNode" />
+              <item name="seconds-kill" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="secondskill" type="462c0819:PsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="seconds-kill" type="b2602c69:ProjectViewProjectNode" />
@@ -678,7 +694,7 @@
       <option name="presentableId" value="Default" />
       <updated>1559873986832</updated>
       <workItem from="1559873992082" duration="12738000" />
-      <workItem from="1559895607755" duration="38246000" />
+      <workItem from="1559895607755" duration="41203000" />
     </task>
     <servers />
   </component>
@@ -715,7 +731,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50984000" />
+    <option name="totallyTimeSpent" value="53941000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="54" y="-8" width="1874" height="1096" extended-state="6" />
@@ -858,8 +874,8 @@
         <state relative-caret-position="270">
           <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
           <folding>
-            <element signature="e#315#316#0" expanded="false" />
-            <element signature="e#379#380#0" expanded="false" />
+            <element signature="e#422#423#0" expanded="true" />
+            <element signature="e#486#487#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -917,17 +933,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/SecondsKillApplication.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="243">
-          <caret line="10" column="17" lean-forward="false" selection-start-line="10" selection-start-column="14" selection-end-line="10" selection-end-column="17" />
-          <folding>
-            <element signature="e#315#316#0" expanded="false" />
-            <element signature="e#379#380#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/pojo/StockOrder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="486">
@@ -970,14 +975,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="17" column="22" lean-forward="true" selection-start-line="17" selection-start-column="22" selection-end-line="17" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/Limit/RedisLimit.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="396">
@@ -1016,16 +1013,6 @@
             <element signature="e#1244#1245#0" expanded="true" />
             <element signature="e#1298#1299#0" expanded="true" />
             <element signature="e#1340#1341#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/utils/RedisPoolUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="13" column="28" lean-forward="false" selection-start-line="13" selection-start-column="28" selection-end-line="13" selection-end-column="28" />
-          <folding>
-            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1096,10 +1083,39 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="20" column="18" lean-forward="true" selection-start-line="20" selection-start-column="18" selection-end-line="20" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/SecondsKillApplication.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+          <folding>
+            <element signature="e#422#423#0" expanded="true" />
+            <element signature="e#486#487#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/controller/IndexController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
+        <state relative-caret-position="612">
           <caret line="101" column="41" lean-forward="true" selection-start-line="101" selection-start-column="41" selection-end-line="101" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/common/utils/RedisPoolUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2907">
+          <caret line="118" column="50" lean-forward="false" selection-start-line="118" selection-start-column="50" selection-end-line="118" selection-end-column="50" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1108,8 +1124,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/daydreamdev/secondskill/service/impl/OrderServiceImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="411">
-          <caret line="69" column="54" lean-forward="true" selection-start-line="69" selection-start-column="54" selection-end-line="69" selection-end-column="54" />
+        <state relative-caret-position="423">
+          <caret line="128" column="37" lean-forward="false" selection-start-line="128" selection-start-column="37" selection-end-line="128" selection-end-column="37" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

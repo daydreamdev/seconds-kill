@@ -14,43 +14,18 @@ import java.util.List;
 public class RedisPoolUtil {
 
     /**
-     * 设置过期时间 exTime 单位是 秒
-     *
-     * @param exTime
-     * @param key
-     * @param value
+     * 判断 key - value 是否存在
      */
-    public static String setEx(String key, int exTime, String value) {
+    public static Boolean exists(String key) {
         Jedis jedis = null;
-        String result = null;
-        try {
-            jedis = RedisPool.getJedis();
-            result = jedis.setex(key, exTime, value);
-        } catch (Exception e) {
-            log.error("setex key:{} exTime:{} value:{} error", key, exTime, value);
-            RedisPool.returnBrokenResource(jedis);
-            return result;
-        }
-        RedisPool.returnResource(jedis);
-        return result;
-    }
+        Boolean result = false;
 
-    /**
-     * 修改 key 过期时间
-     *
-     * @param key
-     * @param exTime
-     */
-    public static Long expire(String key, int exTime) {
-        Jedis jedis = null;
-        Long result = null;
         try {
             jedis = RedisPool.getJedis();
-            result = jedis.expire(key, exTime);
+            result = jedis.exists(key);
         } catch (Exception e) {
-            log.error("expire key:{} error", key, e);
+            log.error("exists key:{} value:{} error", key, e);
             RedisPool.returnBrokenResource(jedis);
-            return result;
         }
         RedisPool.returnResource(jedis);
         return result;
@@ -72,7 +47,6 @@ public class RedisPoolUtil {
         } catch (Exception e) {
             log.error("set key:{} value:{} error", key, value, e);
             RedisPool.returnBrokenResource(jedis);
-            return result;
         }
         RedisPool.returnResource(jedis);
         return result;
@@ -93,7 +67,6 @@ public class RedisPoolUtil {
         } catch (Exception e) {
             log.error("get key:{} error", key, e);
             RedisPool.returnBrokenResource(jedis);
-            return result;
         }
         RedisPool.returnResource(jedis);
         return result;
@@ -113,7 +86,6 @@ public class RedisPoolUtil {
         } catch (Exception e) {
             log.error("del key:{} error", key, e);
             RedisPool.returnBrokenResource(jedis);
-            return result;
         }
         RedisPool.returnResource(jedis);
         return result;
@@ -129,9 +101,8 @@ public class RedisPoolUtil {
             jedis = RedisPool.getJedis();
             result = jedis.lrange(key, 0, -1);
         } catch (Exception e) {
-            log.error("del key:{} error", key, e);
+            log.error("listGet key:{} error", key, e);
             RedisPool.returnBrokenResource(jedis);
-            return result;
         }
         RedisPool.returnResource(jedis);
         return result;
@@ -147,9 +118,8 @@ public class RedisPoolUtil {
             jedis = RedisPool.getJedis();
             result = jedis.lpush(key, version, sale, count);
         } catch (Exception e) {
-            log.error("del key:{} error", key, e);
+            log.error("listPut key:{} error", key, e);
             RedisPool.returnBrokenResource(jedis);
-            return result;
         }
         RedisPool.returnResource(jedis);
         return result;
