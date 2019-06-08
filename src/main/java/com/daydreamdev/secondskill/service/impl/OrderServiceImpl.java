@@ -73,13 +73,7 @@ public class OrderServiceImpl implements OrderService {
         Integer sale = null;
         Integer version = null;
         Boolean res = RedisPoolUtil.exists(RedisKeysConstant.STOCK + sid);
-        if (res) {
-            // Redis 存在，直接从 Redis 中获取
-            List<String> data = RedisPoolUtil.listGet(RedisKeysConstant.STOCK + sid);
-            count = Integer.parseInt(data.get(0));
-            sale = Integer.parseInt(data.get(1));
-            version = Integer.parseInt(data.get(2));
-        } else {
+        if (!res) {
             // Redis 不存在，先从数据库中获取，再放到 Redis 中
             Stock newStock = stockService.getStockById(sid);
             RedisPoolUtil.listPut(RedisKeysConstant.STOCK + newStock.getId(), String.valueOf(newStock.getCount()),
@@ -87,6 +81,14 @@ public class OrderServiceImpl implements OrderService {
             count = newStock.getCount();
             sale = newStock.getSale();
             version = newStock.getVersion();
+        } else {
+            List<String> data = RedisPoolUtil.listGet(RedisKeysConstant.STOCK + sid);
+            if (data.size() == 0 || data.isEmpty()) {
+                log.error("此处报错**************************");
+            }
+            count = Integer.parseInt(data.get(0));
+            sale = Integer.parseInt(data.get(1));
+            version = Integer.parseInt(data.get(2));
         }
         if (count <= 0) {
             log.info("库存不足");
