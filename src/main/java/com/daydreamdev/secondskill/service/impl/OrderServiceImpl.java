@@ -52,7 +52,7 @@ public class OrderServiceImpl implements OrderService{
      */
     private Stock checkStock(int sid) {
         Stock stock = stockService.getStockById(sid);
-        if (stock.getSale().equals(stock.getCount())) {
+        if (stock.getCount() <= 0 || stock.getSale().equals(stock.getCount())) {
             throw new RuntimeException("库存不足");
         }
         return stock;

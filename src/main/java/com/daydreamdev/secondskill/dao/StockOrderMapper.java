@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @auther G.Fukang
  * @date 6/7 14:32
  */
-@Mapper
+@Mapper()
 public interface StockOrderMapper {
 
     @Insert("INSERT INTO stock_order (id, sid, name, create_time) VALUES " +

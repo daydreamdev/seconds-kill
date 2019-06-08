@@ -4,8 +4,6 @@ import com.daydreamdev.secondskill.common.Limit.RedisLimit;
 import com.daydreamdev.secondskill.service.api.OrderService;
 import com.daydreamdev.secondskill.service.api.StockService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,6 +70,8 @@ public class IndexController {
 
     /**
      * 乐观锁更新 + 限流
+     *
+     * @param sid
      */
     @RequestMapping(value = "createOptimisticLimitOrder", method = RequestMethod.POST)
     @ResponseBody

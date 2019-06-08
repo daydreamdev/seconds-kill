@@ -3,7 +3,6 @@ package com.daydreamdev.secondskill.common.Limit;
 import com.daydreamdev.secondskill.common.utils.RedisPool;
 import com.daydreamdev.secondskill.common.utils.ScriptUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
 import java.util.Collections;
