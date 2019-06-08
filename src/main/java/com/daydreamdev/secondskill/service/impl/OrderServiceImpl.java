@@ -63,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * Redis 中校验库存（注意少卖问题）
+     * Redis 中校验库存（存在少卖问题）
      * 由于更新数据时，从 Redis Stock 删除，因此存在校验时 Redis 数据为 NULL 的情况
      *
      * @param sid
@@ -115,11 +115,11 @@ public class OrderServiceImpl implements OrderService {
         }
         // 删除缓存，应该使用 Redis 事务
         RedisPoolUtil.del(RedisKeysConstant.STOCK + stock.getId());
-        // 从数据库中查询
+/*        // 从数据库中查询
         Stock newStock = stockService.getStockById(stock.getId());
         // 重新放入缓存，应该使用 Redis 事务
         RedisPoolUtil.listPut(RedisKeysConstant.STOCK + newStock.getId(), String.valueOf(newStock.getCount()),
-                String.valueOf(newStock.getSale()), String.valueOf(newStock.getVersion()));
+                String.valueOf(newStock.getSale()), String.valueOf(newStock.getVersion()));*/
     }
 
     /**
