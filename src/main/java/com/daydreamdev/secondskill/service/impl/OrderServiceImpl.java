@@ -30,7 +30,7 @@ public class OrderServiceImpl implements OrderService {
     private StockOrderMapper orderMapper;
 
     @Override
-    public int createWrongOrder(int sid) {
+    public int createWrongOrder(int sid) throws Exception{
         Stock stock = checkStock(sid);
         saleStock(stock);
         int id = createOrder(stock);
@@ -39,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public int createOptimisticOrder(int sid) {
+    public int createOptimisticOrder(int sid) throws Exception {
         // 校验库存
         Stock stock = checkStock(sid);
         // 乐观锁更新
@@ -89,7 +89,7 @@ public class OrderServiceImpl implements OrderService {
      * 更新数据库和 Redis 库存
      * 要保证缓存和 DB 的一致性
      */
-    private void saleStockOptimsticWithRedis(Stock stock) {
+    private void saleStockOptimsticWithRedis(Stock stock) throws Exception{
         // 乐观锁更新数据库
         int res = stockService.updateStockByOptimistic(stock);
         if (res == 0) {
@@ -107,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 校验库存
      */
-    private Stock checkStock(int sid) {
+    private Stock checkStock(int sid) throws Exception{
         Stock stock = stockService.getStockById(sid);
         if (stock.getCount() <= 0 || stock.getSale().equals(stock.getCount())) {
             throw new RuntimeException("库存不足");
@@ -127,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 乐观锁扣库存
      */
-    private void saleStockOptimstic(Stock stock) {
+    private void saleStockOptimstic(Stock stock) throws Exception{
         int count = stockService.updateStockByOptimistic(stock);
         if (count == 0) {
             throw new RuntimeException("并发更新库存失败");
@@ -142,7 +142,10 @@ public class OrderServiceImpl implements OrderService {
         order.setSid(stock.getId());
         order.setName(stock.getName());
         order.setCreateTime(new Date());
-        int id = orderMapper.insertSelective(order);
-        return id;
+        int res = orderMapper.insertSelective(order);
+        if (res == 0) {
+            throw new RuntimeException("创建订单失败");
+        }
+        return res;
     }
 }
