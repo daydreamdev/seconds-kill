@@ -63,6 +63,7 @@ public class OrderServiceImpl implements OrderService{
      */
     private int saleStock(Stock stock){
         stock.setSale(stock.getSale() + 1);
+        stock.setCount(stock.getCount() - 1);
         return stockService.updateStockById(stock);
     }
 
