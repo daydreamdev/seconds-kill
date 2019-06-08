@@ -87,4 +87,24 @@ public class IndexController {
         }
         return res == 1 ? success : error;
     }
+
+    /**
+     * Redis 缓存库存，减少 DB 压力
+     * 在 RedisPreheatRunner 做缓存预热，需要 stock.id = 1
+     * @param sid
+     */
+    @RequestMapping(value = "createOrderWithLimitAndRedis", method = RequestMethod.POST)
+    @ResponseBody
+    public String createOrderWithLimitAndRedis(HttpServletRequest request, int sid) {
+        log.info("sid = [{}]", sid);
+        int res = 0;
+        try {
+            if (RedisLimit.limit()) {
+                res = orderService.createOrderWithLimitAndRedis(sid);
+            }
+        } catch (Exception e) {
+            log.error("Exception: " + e);
+        }
+        return res == 1 ? success : error;
+    }
 }
