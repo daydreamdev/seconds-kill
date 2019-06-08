@@ -90,13 +90,13 @@ public class OrderServiceImpl implements OrderService {
      * 要保证缓存和 DB 的一致性
      */
     private void saleStockOptimsticWithRedis(Stock stock) {
-        // 删除缓存，应该使用 Redis 事务
-        RedisPoolUtil.del(RedisKeysConstant.STOCK + stock.getId());
         // 乐观锁更新数据库
         int res = stockService.updateStockByOptimistic(stock);
         if (res == 0) {
             throw new RuntimeException("并发更新库存失败");
         }
+        // 删除缓存，应该使用 Redis 事务
+        RedisPoolUtil.del(RedisKeysConstant.STOCK + stock.getId());
         // 从数据库中查询
         Stock newStock = stockService.getStockById(stock.getId());
         // 重新放入缓存，应该使用 Redis 事务
