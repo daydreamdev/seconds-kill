@@ -39,7 +39,6 @@ public class IndexController {
     @RequestMapping(value = "createWrongOrder", method = RequestMethod.POST)
     @ResponseBody
     public String createWrongOrder(HttpServletRequest request, int sid) {
-        log.info("sid = [{}]", sid);
         int res = 0;
         try {
             res = orderService.createWrongOrder(sid);
@@ -58,7 +57,6 @@ public class IndexController {
     @RequestMapping(value = "createOptimisticOrder", method = RequestMethod.POST)
     @ResponseBody
     public String createOptimisticOrder(HttpServletRequest request, int sid) {
-        log.info("sid = [{}]", sid);
         int res = 0;
         try {
             res = orderService.createOptimisticOrder(sid);
@@ -76,7 +74,6 @@ public class IndexController {
     @RequestMapping(value = "createOptimisticLimitOrder", method = RequestMethod.POST)
     @ResponseBody
     public String createOptimisticLimitOrder(HttpServletRequest request, int sid) {
-        log.info("sid = [{}]", sid);
         int res = 0;
         try {
             if (RedisLimit.limit()) {
@@ -96,7 +93,6 @@ public class IndexController {
     @RequestMapping(value = "createOrderWithLimitAndRedis", method = RequestMethod.POST)
     @ResponseBody
     public String createOrderWithLimitAndRedis(HttpServletRequest request, int sid) {
-        log.info("sid = [{}]", sid);
         int res = 0;
         try {
             if (RedisLimit.limit()) {

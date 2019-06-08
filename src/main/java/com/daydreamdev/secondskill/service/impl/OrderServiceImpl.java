@@ -70,8 +70,8 @@ public class OrderServiceImpl implements OrderService {
         Integer count = Integer.parseInt(data.get(0));
         Integer sale = Integer.parseInt(data.get(1));
         Integer version = Integer.parseInt(data.get(2));
-        if (count.equals(sale) || count <= 0) {
-            log.info("库存不足 Redis currentCount: {}" + sale);
+        if (count <= 0) {
+            log.info("库存不足");
             throw new RuntimeException("库存不足 Redis currentCount: " + sale);
         }
         Stock stock = new Stock();
@@ -109,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
      */
     private Stock checkStock(int sid) throws Exception{
         Stock stock = stockService.getStockById(sid);
-        if (stock.getCount() <= 0 || stock.getSale().equals(stock.getCount())) {
+        if (stock.getCount() <= 0) {
             throw new RuntimeException("库存不足");
         }
         return stock;
