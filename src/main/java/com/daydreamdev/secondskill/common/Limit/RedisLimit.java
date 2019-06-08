@@ -38,10 +38,10 @@ public class RedisLimit {
                 return true;
             }
         } catch (Exception e) {
-            log.error("获取 Jedis 实例失败：", e);
-            RedisPool.returnBrokenResource(jedis);
+            log.error("Limit 获取 Jedis 实例失败：", e);
+        } finally {
+            RedisPool.jedisPoolClose(jedis);
         }
-        RedisPool.returnResource(jedis);
         return false;
     }
 }

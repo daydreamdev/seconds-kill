@@ -14,24 +14,6 @@ import java.util.List;
 public class RedisPoolUtil {
 
     /**
-     * 判断 key - value 是否存在
-     */
-    public static Boolean exists(String key) {
-        Jedis jedis = null;
-        Boolean result = false;
-
-        try {
-            jedis = RedisPool.getJedis();
-            result = jedis.exists(key);
-        } catch (Exception e) {
-            log.error("exists key:{} value:{} error", key, e);
-        } finally {
-            RedisPool.jedisPoolClose(jedis);
-        }
-        return result;
-    }
-
-    /**
      * 设置 key - value 值
      *
      * @param key
@@ -85,6 +67,40 @@ public class RedisPoolUtil {
             result = jedis.del(key);
         } catch (Exception e) {
             log.error("del key:{} error", key, e);
+        } finally {
+            RedisPool.jedisPoolClose(jedis);
+        }
+        return result;
+    }
+
+    /**
+     * key - value 自增
+     */
+    public static Long incr (String key) {
+        Jedis jedis = null;
+        Long result = null;
+        try {
+            jedis = RedisPool.getJedis();
+            result = jedis.incr(key);
+        } catch (Exception e) {
+            log.error("listGet key:{} error", key, e);
+        } finally {
+            RedisPool.jedisPoolClose(jedis);
+        }
+        return result;
+    }
+
+    /**
+     * key - value 自减
+     */
+    public static Long decr (String key) {
+        Jedis jedis = null;
+        Long result = null;
+        try {
+            jedis = RedisPool.getJedis();
+            result = jedis.decr(key);
+        } catch (Exception e) {
+            log.error("listGet key:{} error", key, e);
         } finally {
             RedisPool.jedisPoolClose(jedis);
         }

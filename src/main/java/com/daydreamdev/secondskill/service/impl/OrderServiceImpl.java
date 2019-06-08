@@ -1,6 +1,7 @@
 package com.daydreamdev.secondskill.service.impl;
 
 import com.daydreamdev.secondskill.common.RedisKeysConstant;
+import com.daydreamdev.secondskill.common.StockWithRedis.UpdateStockWithRedis;
 import com.daydreamdev.secondskill.common.utils.RedisPoolUtil;
 import com.daydreamdev.secondskill.dao.StockOrderMapper;
 import com.daydreamdev.secondskill.pojo.Stock;
@@ -63,16 +64,51 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * Redis 中校验库存（存在少卖问题）
-     * 由于更新数据时，从 Redis Stock 删除，因此存在校验时 Redis 数据为 NULL 的情况
+     * Redis 校验库存
      *
      * @param sid
      */
     private Stock checkStockWithRedis(int sid) throws Exception {
+        Integer count = Integer.parseInt(RedisPoolUtil.get(RedisKeysConstant.STOCK_COUNT + sid));
+        Integer sale = Integer.parseInt(RedisPoolUtil.get(RedisKeysConstant.STOCK_SALE + sid));
+        Integer version = Integer.parseInt(RedisPoolUtil.get(RedisKeysConstant.STOCK_VERSION + sid));
+        if (count <= 0) {
+            log.info("库存不足");
+            throw new RuntimeException("库存不足 Redis currentCount: " + sale);
+        }
+        Stock stock = new Stock();
+        stock.setId(sid);
+        stock.setCount(count);
+        stock.setSale(sale);
+        stock.setVersion(version);
+        // 此处应该是热更新，但是在数据库中只有一个商品，所以直接赋值
+        stock.setName("手机");
+
+        return stock;
+    }
+
+    /**
+     * 更新数据库和 DB，保证一致性
+     */
+    private void saleStockOptimsticWithRedis(Stock stock) throws Exception {
+        int res = stockService.updateStockByOptimistic(stock);
+        if (res == 0){
+            throw new RuntimeException("并发更新库存失败") ;
+        }
+        // 更新 Redis
+        UpdateStockWithRedis.updateStockWithRedis(stock);
+    }
+
+
+    /**
+     * Redis 中校验库存
+     * 由于更新数据时，从 Redis Stock 删除，因此存在校验时 Redis 数据为 NULL 的情况
+     * @param sid
+     */
+    private Stock checkStockWithRedisWithDel(int sid) throws Exception {
         Integer count = null;
         Integer sale = null;
         Integer version = null;
-        // Boolean res = RedisPoolUtil.exists(RedisKeysConstant.STOCK + sid);
         List<String> data = RedisPoolUtil.listGet(RedisKeysConstant.STOCK + sid);
         if (data.size() == 0) {
             // Redis 不存在，先从数据库中获取，再放到 Redis 中
@@ -83,9 +119,6 @@ public class OrderServiceImpl implements OrderService {
             sale = newStock.getSale();
             version = newStock.getVersion();
         } else {
-            if (data.size() == 0 || data.isEmpty()) {
-                log.error("此处报错**************************");
-            }
             count = Integer.parseInt(data.get(0));
             sale = Integer.parseInt(data.get(1));
             version = Integer.parseInt(data.get(2));
@@ -109,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
      * 更新数据库和 Redis 库存
      * 要保证缓存和 DB 的一致性
      */
-    private void saleStockOptimsticWithRedis(Stock stock) throws Exception {
+    private void saleStockOptimsticWithRedisWithDel(Stock stock) throws Exception {
         // 乐观锁更新数据库
         int res = stockService.updateStockByOptimistic(stock);
         // 删除缓存，应该使用 Redis 事务
