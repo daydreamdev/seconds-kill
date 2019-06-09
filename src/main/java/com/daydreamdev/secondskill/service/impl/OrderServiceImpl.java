@@ -1,7 +1,7 @@
 package com.daydreamdev.secondskill.service.impl;
 
 import com.daydreamdev.secondskill.common.RedisKeysConstant;
-import com.daydreamdev.secondskill.common.StockWithRedis.UpdateStockWithRedis;
+import com.daydreamdev.secondskill.common.StockWithRedis.StockWithRedis;
 import com.daydreamdev.secondskill.common.utils.RedisPoolUtil;
 import com.daydreamdev.secondskill.dao.StockOrderMapper;
 import com.daydreamdev.secondskill.pojo.Stock;
@@ -34,9 +34,9 @@ public class OrderServiceImpl implements OrderService {
     public int createWrongOrder(int sid) throws Exception {
         Stock stock = checkStock(sid);
         saleStock(stock);
-        int id = createOrder(stock);
+        int res = createOrder(stock);
 
-        return id;
+        return res;
     }
 
     @Override
@@ -58,9 +58,9 @@ public class OrderServiceImpl implements OrderService {
         // 乐观锁更新库存和Redis
         saleStockOptimsticWithRedis(stock);
         // 创建订单
-        int id = createOrder(stock);
+        int res = createOrder(stock);
 
-        return id;
+        return res;
     }
 
     /**
@@ -72,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
         Integer count = Integer.parseInt(RedisPoolUtil.get(RedisKeysConstant.STOCK_COUNT + sid));
         Integer sale = Integer.parseInt(RedisPoolUtil.get(RedisKeysConstant.STOCK_SALE + sid));
         Integer version = Integer.parseInt(RedisPoolUtil.get(RedisKeysConstant.STOCK_VERSION + sid));
-        if (count <= 0) {
+        if (count < 1) {
             log.info("库存不足");
             throw new RuntimeException("库存不足 Redis currentCount: " + sale);
         }
@@ -88,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 更新数据库和 DB，保证一致性
+     * 更新数据库和 DB
      */
     private void saleStockOptimsticWithRedis(Stock stock) throws Exception {
         int res = stockService.updateStockByOptimistic(stock);
@@ -96,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("并发更新库存失败") ;
         }
         // 更新 Redis
-        UpdateStockWithRedis.updateStockWithRedis(stock);
+        StockWithRedis.updateStockWithRedis(stock);
     }
 
 
@@ -123,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
             sale = Integer.parseInt(data.get(1));
             version = Integer.parseInt(data.get(2));
         }
-        if (count <= 0) {
+        if (count < 1) {
             log.info("库存不足");
             throw new RuntimeException("库存不足 Redis currentCount: " + sale);
         }
@@ -151,11 +151,6 @@ public class OrderServiceImpl implements OrderService {
         if (res == 0) {
             throw new RuntimeException("并发更新库存失败");
         }
-/*        // 从数据库中查询
-        Stock newStock = stockService.getStockById(stock.getId());
-        // 重新放入缓存，应该使用 Redis 事务
-        RedisPoolUtil.listPut(RedisKeysConstant.STOCK + newStock.getId(), String.valueOf(newStock.getCount()),
-                String.valueOf(newStock.getSale()), String.valueOf(newStock.getVersion()));*/
     }
 
     /**
@@ -163,7 +158,7 @@ public class OrderServiceImpl implements OrderService {
      */
     private Stock checkStock(int sid) throws Exception {
         Stock stock = stockService.getStockById(sid);
-        if (stock.getCount() <= 0) {
+        if (stock.getCount() < 1) {
             throw new RuntimeException("库存不足");
         }
         return stock;

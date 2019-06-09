@@ -97,6 +97,9 @@ public class IndexController {
         try {
             if (RedisLimit.limit()) {
                 res = orderService.createOrderWithLimitAndRedis(sid);
+                if (res == 1) {
+                    log.info("下单成功...");
+                }
             }
         } catch (Exception e) {
             log.error("Exception: " + e);
