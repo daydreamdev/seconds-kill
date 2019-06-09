@@ -83,11 +83,11 @@ private int createOrder(Stock stock) throws Exception {
 
 超卖问题出现的场景
 
-![]()
+![](https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/%E7%A7%92%E6%9D%80%E8%B6%85%E5%8D%96.png)
 
 悲观锁是表级锁，虽然可以解决超卖问题，但是由于排斥外部请求，会导致很多请求等待锁，卡死在这里，如果这种请求很多就会耗尽连接，系统出现异常。乐观锁默认不加锁，跟新失败就直接返回抢购失败，可以承受较高并发
 
-![]()
+![](https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/%E4%B9%90%E8%A7%82%E9%94%81%E6%89%A3%E5%BA%93%E5%AD%98.png)
 
 ```java
 @Override
@@ -107,7 +107,235 @@ public int createOptimisticOrder(int sid) throws Exception {
 
 ### 2. Redis 计数限流
 
-根据前面的优化分析，假设现在有 10 个商品
+根据前面的优化分析，假设现在有 10 个商品，有 1000 个并发秒杀请求，最终只有 10 个订单会成功创建，也就是说有 990 的请求是无效的，这些无效的请求也会给数据库带来压力，因此可以在在请求落到数据库之前就将无效的请求过滤掉，将并发控制在一个可控的范围，这样落到数据库的压力就小很多
+
+关于限流的方法，可以看这篇博客[浅析限流算法](<https://gongfukangee.github.io/2019/04/04/Limit/>)，由于计数限流实现起来比较简单，因此采用计数限流，限流的实现可以直接使用 Guava 的 RateLimit 方法，但是由于后续需要将实例通过 Nginx 实现负载均衡，这里选用 Redis 实现分布式限流
+
+在 `RedisPool` 中对 `Jedis` 线程池进行了简单的封装，封装了初始化和关闭方法，同时在 `RedisPoolUtil` 中对 Jedis 常用 API 进行简单封装，每个方法调用完毕则关闭 Jedis 连接。
+
+限流要保证写入 Redis 操作的原子性，因此利用 Redis 的单线程机制，通过 LUA 脚本来完成。
+
+![](https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/%E7%A7%92%E6%9D%80%E9%99%90%E6%B5%81.png)
+
+```java
+@Slf4j
+public class RedisLimit {
+
+    private static final int FAIL_CODE = 0;
+
+    private static Integer limit = 5;
+
+    /**
+     * Redis 限流
+     */
+    public static Boolean limit() {
+        Jedis jedis = null;
+        Object result = null;
+        try {
+            // 获取 jedis 实例
+            jedis = RedisPool.getJedis();
+            // 解析 Lua 文件
+            String script = ScriptUtil.getScript("limit.lua");
+            // 请求限流
+            String key = String.valueOf(System.currentTimeMillis() / 1000);
+            // 计数限流
+            result = jedis.eval(script, Collections.singletonList(key), Collections.singletonList(String.valueOf(limit)));
+            if (FAIL_CODE != (Long) result) {
+                log.info("成功获取令牌");
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("Limit 获取 Jedis 实例失败：", e);
+        } finally {
+            RedisPool.jedisPoolClose(jedis);
+        }
+        return false;
+    }
+}
+// 在 Controller 中，每个请求到来先取令牌，获取到令牌再执行后续操作，获取不到直接返回 ERROR
+public String createOptimisticLimitOrder(HttpServletRequest request, int sid) {
+    int res = 0;
+    try {
+        if (RedisLimit.limit()) {
+            res = orderService.createOptimisticOrder(sid);
+        }
+    } catch (Exception e) {
+        log.error("Exception: " + e);
+    }
+    return res == 1 ? success : error;
+}
+```
+
+### 3. Redis 缓存商品库存信息
+
+虽然限流能够过滤掉一些无效的请求，但是还是会有很多请求落在数据库上，通过 `Druid` 监控可以看出，实时查询库存的语句被大量调用，对于每个没有被过滤掉的请求，都会去数据库查询库存来判断库存是否充足，对于这个查询可以放在缓存 Redis 中，Redis 的数据是存放在内存中的，速度快很多。
+
+![](<https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/Redis%20%E7%BC%93%E5%AD%98%E5%BA%93%E5%AD%98%E4%BF%A1%E6%81%AF.png>)
+
+#### 缓存预热
+
+在秒杀开始前，需要将秒杀商品信息提前缓存到 Redis 中，这么秒杀开始时则直接从 Redis 中读取，也就是缓存预热，Springboot 中开发者通过 `implement ApplicationRunner` 来设定 SpringBoot 启动后立即执行的方法
+
+```java
+@Component
+public class RedisPreheatRunner implements ApplicationRunner {
+
+    @Autowired
+    private StockService stockService;
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // 从数据库中查询热卖商品，商品 id 为 1
+        Stock stock = stockService.getStockById(1);
+        // 删除旧缓存
+        RedisPoolUtil.del(RedisKeysConstant.STOCK_COUNT + stock.getCount());
+        RedisPoolUtil.del(RedisKeysConstant.STOCK_SALE + stock.getSale());
+        RedisPoolUtil.del(RedisKeysConstant.STOCK_VERSION + stock.getVersion());
+        //缓存预热
+        int sid = stock.getId();
+        RedisPoolUtil.set(RedisKeysConstant.STOCK_COUNT + sid, String.valueOf(stock.getCount()));
+        RedisPoolUtil.set(RedisKeysConstant.STOCK_SALE + sid, String.valueOf(stock.getSale()));
+        RedisPoolUtil.set(RedisKeysConstant.STOCK_VERSION + sid, 			String.valueOf(stock.getVersion()));
+    }
+}
+```
+
+#### 缓存和数据一致性
+
+缓存和 DB 的一致性是一个讨论很多的问题，推荐看参考中的 [使用缓存的正确姿势](<https://juejin.im/post/5af5b2c36fb9a07ac65318bd#heading-11>)，首先看下先更新数据库，再更新缓存策略，假设 A、B 两个线程，A 成功更新数据，在要更新缓存时，A 的时间片用完了，B 更新了数据库接着更新了缓存，这是 CPU 再分配给 A，则 A 又更新了缓存，这种情况下缓存中就是脏数据，具体逻辑如下图所示：
+
+![](<https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%85%88%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E5%86%8D%E6%9B%B4%E6%96%B0%E7%BC%93%E5%AD%98.png>)
+
+那么，如果避免这个问题呢？就是缓存不做更新，仅做删除，先更新数据库再删除缓存。对于上面的问题，A 更新了数据库，还没来得及删除缓存，B 又更新了数据库，接着删除了缓存，然后 A 删除了缓存，这样只有下次缓存未命中时，才会从数据库中重建缓存，避免了脏数据。但是，也会有极端情况出现脏数据，A 做查询操作，没有命中缓存，从数据库中查询，但是还没来得及更新缓存，B 就更新了数据库，接着删除了缓存，然后 A 又重建了缓存，这时 A 中的就是脏数据，如下图所示。但是这种极端情况需要数据库的写操作前进入数据库，又晚于写操作删除缓存来更新缓存，发生的概率极其小，不过为了避免这种情况，可以为缓存设置过期时间。
+
+![](<https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%85%88%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E5%86%8D%E5%88%A0%E9%99%A4%E7%BC%93%E5%AD%98.png>)
+
+安装先更新数据库再删除缓存的策略来执行，代码如下所示：
+
+```java
+@Override
+public int createOrderWithLimitAndRedis(int sid) throws Exception {
+    // 校验库存，从 Redis 中获取
+    Stock stock = checkStockWithRedis(sid);
+    // 乐观锁更新库存和Redis
+    saleStockOptimsticWithRedis(stock);
+    // 创建订单
+    int res = createOrder(stock);
+    return res;
+}
+// Redis 校验库存
+private Stock checkStockWithRedisWithDel(int sid) throws Exception {
+    Integer count = null;
+    Integer sale = null;
+    Integer version = null;
+    List<String> data = RedisPoolUtil.listGet(RedisKeysConstant.STOCK + sid);
+    if (data.size() == 0) {
+        // Redis 不存在，先从数据库中获取，再放到 Redis 中
+        Stock newStock = stockService.getStockById(sid);
+        RedisPoolUtil.listPut(RedisKeysConstant.STOCK + newStock.getId(), String.valueOf(newStock.getCount()),
+                              String.valueOf(newStock.getSale()), String.valueOf(newStock.getVersion()));
+        count = newStock.getCount();
+        sale = newStock.getSale();
+        version = newStock.getVersion();
+    } else {
+        count = Integer.parseInt(data.get(0));
+        sale = Integer.parseInt(data.get(1));
+        version = Integer.parseInt(data.get(2));
+    }
+    if (count < 1) {
+        log.info("库存不足");
+        throw new RuntimeException("库存不足 Redis currentCount: " + sale);
+    }
+    Stock stock = new Stock();
+    stock.setId(sid);
+    stock.setCount(count);
+    stock.setSale(sale);
+    stock.setVersion(version);
+    // 此处应该是热更新，但是在数据库中只有一个商品，所以直接赋值
+    stock.setName("手机");
+    return stock;
+}
+private void saleStockOptimsticWithRedisWithDel(Stock stock) throws Exception {
+    // 乐观锁更新数据库
+    int res = stockService.updateStockByOptimistic(stock);
+    // 删除缓存，应该使用 Redis 事务
+    RedisPoolUtil.del(RedisKeysConstant.STOCK + stock.getId());
+    log.info("删除缓存成功");
+    if (res == 0) {
+        throw new RuntimeException("并发更新库存失败");
+    }
+}
+```
+
+在 Jmeter 压力测试中，并发效果并不好，跟前面的限流并发差不多，观察 Redis 中的数据看出，由于每次都删除缓存，因此导致多次缓存都不能命中，能命中缓存的次数很少，因此这种方案并不可取。
+
+考虑到使用乐观锁更新数据库，因此在使用先更新数据库再更新缓存的策略中，实际情况如下所示
+
+![](<https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%85%88%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E5%86%8D%E6%9B%B4%E6%96%B0%E7%BC%93%E5%AD%98V2.png>)
+
+在 A 未更新缓存阶段，虽然 B 从缓存中获取到的库存信息脏数据，但是，乐观锁使得 B 在更新数据库时失败，这时 A 又更新了缓存，则保证了数据的最终一致性，并且由于缓存一直都可以命中，对并发量的提升也是很显著的。
+
+```java
+@Override
+public int createOrderWithLimitAndRedis(int sid) throws Exception {
+    // 校验库存，从 Redis 中获取
+    Stock stock = checkStockWithRedis(sid);
+    // 乐观锁更新库存和Redis
+    saleStockOptimsticWithRedis(stock);
+    // 创建订单
+    int res = createOrder(stock);
+    return res;
+}
+// Redis 中校验库存
+private Stock checkStockWithRedis(int sid) throws Exception {
+    Integer count = Integer.parseInt(RedisPoolUtil.get(RedisKeysConstant.STOCK_COUNT + sid));
+    Integer sale = Integer.parseInt(RedisPoolUtil.get(RedisKeysConstant.STOCK_SALE + sid));
+    Integer version = Integer.parseInt(RedisPoolUtil.get(RedisKeysConstant.STOCK_VERSION + sid));
+    if (count < 1) {
+        log.info("库存不足");
+        throw new RuntimeException("库存不足 Redis currentCount: " + sale);
+    }
+    Stock stock = new Stock();
+    stock.setId(sid);
+    stock.setCount(count);
+    stock.setSale(sale);
+    stock.setVersion(version);
+    // 此处应该是热更新，但是在数据库中只有一个商品，所以直接赋值
+    stock.setName("手机");
+
+    return stock;
+}
+// 更新 DB 和 Redis
+private void saleStockOptimsticWithRedis(Stock stock) throws Exception {
+    int res = stockService.updateStockByOptimistic(stock);
+    if (res == 0){
+        throw new RuntimeException("并发更新库存失败") ;
+    }
+    // 更新 Redis
+    StockWithRedis.updateStockWithRedis(stock);
+}
+// Redis 多个写入操作的事务
+public static void updateStockWithRedis(Stock stock) {
+    Jedis jedis = null;
+    try {
+        jedis = RedisPool.getJedis();
+        // 开始事务
+        Transaction transaction = jedis.multi();
+        // 事务操作
+        RedisPoolUtil.decr(RedisKeysConstant.STOCK_COUNT + stock.getId());
+        RedisPoolUtil.incr(RedisKeysConstant.STOCK_SALE + stock.getId());
+        RedisPoolUtil.incr(RedisKeysConstant.STOCK_VERSION + stock.getId());
+        // 结束事务
+        List<Object> list = transaction.exec();
+    } catch (Exception e) {
+        log.error("updateStock 获取 Jedis 实例失败：", e);
+    } finally {
+        RedisPool.jedisPoolClose(jedis);
+    }
+}
+```
+
+### 4. Kafka 异步
 
 ##  数据库建表
 
@@ -135,3 +363,4 @@ CREATE TABLE `stock_order` (
 >- [crossoverjie：SSM(十八)秒杀架构实践](<https://crossoverjie.top/2018/05/07/ssm/SSM18-seconds-kill/>)
 >- [秒杀系统优化方案（下）吐血整理](<https://www.cnblogs.com/xiangkejin/p/9351501.html>)
 >- [电商网站秒杀与抢购的系统架构](http://www.codeceo.com/article/spike-system-artch.html)
+>- [使用缓存的正确姿势](<https://juejin.im/post/5af5b2c36fb9a07ac65318bd#heading-11>)
