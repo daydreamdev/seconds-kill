@@ -242,11 +242,11 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1974" />
-    <option name="y" value="-8" />
-    <option name="width" value="1394" />
-    <option name="height" value="916" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="2049" />
+    <option name="y" value="10" />
+    <option name="width" value="1232" />
+    <option name="height" value="761" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -728,7 +728,7 @@
       <option name="presentableId" value="Default" />
       <updated>1559873986832</updated>
       <workItem from="1559873992082" duration="12738000" />
-      <workItem from="1559895607755" duration="61749000" />
+      <workItem from="1559895607755" duration="62341000" />
     </task>
     <servers />
   </component>
@@ -765,10 +765,10 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="74487000" />
+    <option name="totallyTimeSpent" value="75079000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1974" y="-8" width="1394" height="916" extended-state="6" />
+    <frame x="2049" y="10" width="1232" height="761" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
