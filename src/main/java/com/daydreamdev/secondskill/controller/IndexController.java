@@ -49,6 +49,9 @@ public class IndexController {
         } catch (Exception e) {
             log.error("Exception: ", e);
         }
+        if (res == 1) {
+            log.info("重置数据库和缓存成功！");
+        }
         return res == 1 ? success : error;
     }
 
@@ -120,7 +123,7 @@ public class IndexController {
             if (RedisLimit.limit()) {
                 res = orderService.createOrderWithLimitAndRedis(sid);
                 if (res == 1) {
-                    log.info("下单成功...");
+                    log.info("秒杀成功");
                 }
             }
         } catch (Exception e) {
