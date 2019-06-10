@@ -39,4 +39,26 @@ public class StockWithRedis {
             RedisPool.jedisPoolClose(jedis);
         }
     }
+
+    /**
+     * 重置缓存
+     */
+    public static void initRedisBefore() {
+        Jedis jedis = null;
+        try {
+            jedis = RedisPool.getJedis();
+            // 开始事务
+            Transaction transaction = jedis.multi();
+            // 事务操作
+            RedisPoolUtil.set(RedisKeysConstant.STOCK_COUNT + 1, "50");
+            RedisPoolUtil.set(RedisKeysConstant.STOCK_SALE + 1, "0");
+            RedisPoolUtil.set(RedisKeysConstant.STOCK_VERSION + 1, "0");
+            // 结束事务
+            List<Object> list = transaction.exec();
+        } catch (Exception e) {
+            log.error("initRedis 获取 Jedis 实例失败：", e);
+        } finally {
+            RedisPool.jedisPoolClose(jedis);
+        }
+    }
 }

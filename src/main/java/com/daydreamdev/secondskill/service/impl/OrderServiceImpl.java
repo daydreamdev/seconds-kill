@@ -31,6 +31,11 @@ public class OrderServiceImpl implements OrderService {
     private StockOrderMapper orderMapper;
 
     @Override
+    public int delOrderDBBefore() {
+        return orderMapper.delOrderDBBefore();
+    }
+
+    @Override
     public int createWrongOrder(int sid) throws Exception {
         Stock stock = checkStock(sid);
         saleStock(stock);

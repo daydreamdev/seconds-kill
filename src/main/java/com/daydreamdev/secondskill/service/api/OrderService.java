@@ -7,6 +7,11 @@ package com.daydreamdev.secondskill.service.api;
 public interface OrderService {
 
     /**
+     * 清空订单表
+     */
+    int delOrderDBBefore();
+
+    /**
      * 创建订单（存在超卖问题）
      * @param sid
      * @return int

@@ -1,6 +1,7 @@
 package com.daydreamdev.secondskill.controller;
 
 import com.daydreamdev.secondskill.common.Limit.RedisLimit;
+import com.daydreamdev.secondskill.common.StockWithRedis.StockWithRedis;
 import com.daydreamdev.secondskill.service.api.OrderService;
 import com.daydreamdev.secondskill.service.api.StockService;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +31,26 @@ public class IndexController {
 
     @Autowired
     private StockService stockService;
+
+    /**
+     * 压测前先请求该方法，初始化数据库和缓存
+     */
+    @RequestMapping(value = "initDBAndRedis", method = RequestMethod.POST)
+    @ResponseBody
+    public String initDBAndRedisBefore(HttpServletRequest request) {
+        int res = 0;
+        try {
+            // 初始化库存信息
+            res = stockService.initDBBefore();
+            // 清空订单表
+            res &= (orderService.delOrderDBBefore() == 0 ? 1 : 0);
+            // 重置缓存
+            StockWithRedis.initRedisBefore();
+        } catch (Exception e) {
+            log.error("Exception: ", e);
+        }
+        return res == 1 ? success : error;
+    }
 
     /**
      * 秒杀基本逻辑，存在超卖问题

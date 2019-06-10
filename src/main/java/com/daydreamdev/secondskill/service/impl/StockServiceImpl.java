@@ -39,4 +39,10 @@ public class StockServiceImpl implements StockService {
 
         return stockMapper.updateByOptimistic(stock);
     }
+
+    @Override
+    public int initDBBefore() {
+
+        return stockMapper.initDBBefore();
+    }
 }
