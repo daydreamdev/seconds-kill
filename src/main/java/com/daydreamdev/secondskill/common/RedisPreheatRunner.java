@@ -24,12 +24,6 @@ public class RedisPreheatRunner implements ApplicationRunner {
         // 从数据库中查询热卖商品
         Stock stock = stockService.getStockById(1);
 
-        // 删除 Redis 中旧的缓存
-        RedisPoolUtil.del(RedisKeysConstant.STOCK + stock.getId());
-        // 缓存预热
-        RedisPoolUtil.listPut(RedisKeysConstant.STOCK + stock.getId(), String.valueOf(stock.getCount()),
-                String.valueOf(stock.getSale()), String.valueOf(stock.getVersion()));
-
         // 删除旧缓存
         RedisPoolUtil.del(RedisKeysConstant.STOCK_COUNT + stock.getCount());
         RedisPoolUtil.del(RedisKeysConstant.STOCK_SALE + stock.getSale());

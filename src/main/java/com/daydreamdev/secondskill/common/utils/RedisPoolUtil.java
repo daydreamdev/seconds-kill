@@ -140,14 +140,4 @@ public class RedisPoolUtil {
         }
         return result;
     }
-
-    public static void main(String[] args) {
-        int sid = 111;
-        RedisPoolUtil.listPut(RedisKeysConstant.STOCK + sid, "10", "0", "0");
-        List<String> data = RedisPoolUtil.listGet(RedisKeysConstant.STOCK + sid);
-        Integer count = Integer.parseInt(data.get(0));
-        Integer sale = Integer.parseInt(data.get(1));
-        Integer version = Integer.parseInt(data.get(2));
-        System.out.println(count.toString() + "  " + sale.toString() + "  " + version.toString());
-    }
 }

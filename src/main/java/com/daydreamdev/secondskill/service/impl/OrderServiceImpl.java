@@ -104,60 +104,6 @@ public class OrderServiceImpl implements OrderService {
         StockWithRedis.updateStockWithRedis(stock);
     }
 
-
-    /**
-     * Redis 中校验库存
-     * 由于更新数据时，从 Redis Stock 删除，因此存在校验时 Redis 数据为 NULL 的情况
-     * @param sid
-     */
-    private Stock checkStockWithRedisWithDel(int sid) throws Exception {
-        Integer count = null;
-        Integer sale = null;
-        Integer version = null;
-        List<String> data = RedisPoolUtil.listGet(RedisKeysConstant.STOCK + sid);
-        if (data.size() == 0) {
-            // Redis 不存在，先从数据库中获取，再放到 Redis 中
-            Stock newStock = stockService.getStockById(sid);
-            RedisPoolUtil.listPut(RedisKeysConstant.STOCK + newStock.getId(), String.valueOf(newStock.getCount()),
-                    String.valueOf(newStock.getSale()), String.valueOf(newStock.getVersion()));
-            count = newStock.getCount();
-            sale = newStock.getSale();
-            version = newStock.getVersion();
-        } else {
-            count = Integer.parseInt(data.get(0));
-            sale = Integer.parseInt(data.get(1));
-            version = Integer.parseInt(data.get(2));
-        }
-        if (count < 1) {
-            log.info("库存不足");
-            throw new RuntimeException("库存不足 Redis currentCount: " + sale);
-        }
-        Stock stock = new Stock();
-        stock.setId(sid);
-        stock.setCount(count);
-        stock.setSale(sale);
-        stock.setVersion(version);
-        // 此处应该是热更新，但是在数据库中只有一个商品，所以直接赋值
-        stock.setName("手机");
-
-        return stock;
-    }
-
-    /**
-     * 更新数据库和 Redis 库存
-     * 要保证缓存和 DB 的一致性
-     */
-    private void saleStockOptimsticWithRedisWithDel(Stock stock) throws Exception {
-        // 乐观锁更新数据库
-        int res = stockService.updateStockByOptimistic(stock);
-        // 删除缓存，应该使用 Redis 事务
-        RedisPoolUtil.del(RedisKeysConstant.STOCK + stock.getId());
-        log.info("删除缓存成功");
-        if (res == 0) {
-            throw new RuntimeException("并发更新库存失败");
-        }
-    }
-
     /**
      * 校验库存
      */

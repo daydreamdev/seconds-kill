@@ -22,7 +22,7 @@ public class RedisPool {
 
     private static Boolean testOnBorrow = true;
 
-    private static String redisIP= "47.106.218.181";
+    private static String redisIP= "119.3.214.253";
 
     private static Integer redisPort = 6379;
 

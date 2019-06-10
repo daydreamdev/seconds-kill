@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="seconds-kill" uuid="4710fb9d-c59f-4ae4-bdf2-9b293bbfc1b0">
+    <data-source source="LOCAL" name="HWYun" uuid="a2fed71b-6822-4e41-a514-8ab1d04ff389">
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://47.106.218.181:3306/seconds_kill</jdbc-url>
+      <jdbc-url>jdbc:mysql://119.3.214.253:3306/seconds_kill</jdbc-url>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />

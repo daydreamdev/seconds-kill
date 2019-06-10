@@ -7,11 +7,6 @@ package com.daydreamdev.secondskill.common;
 public class RedisKeysConstant {
 
     /**
-     * 库存
-     */
-    public final static String STOCK = "stock_";
-
-    /**
      * 库存值
      */
     public final static String STOCK_COUNT = "stock_count_";
