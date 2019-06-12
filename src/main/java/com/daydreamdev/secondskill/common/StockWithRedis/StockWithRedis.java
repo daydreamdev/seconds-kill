@@ -1,6 +1,5 @@
-package com.daydreamdev.secondskill.common.StockWithRedis;
+package com.daydreamdev.secondskill.common.stockWithRedis;
 
-import com.daydreamdev.secondskill.common.RedisKeysConstant;
 import com.daydreamdev.secondskill.common.utils.RedisPool;
 import com.daydreamdev.secondskill.common.utils.RedisPoolUtil;
 import com.daydreamdev.secondskill.pojo.Stock;

@@ -1,4 +1,4 @@
-package com.daydreamdev.secondskill.common.Limit;
+package com.daydreamdev.secondskill.common.limit;
 
 import com.daydreamdev.secondskill.common.utils.RedisPool;
 import com.daydreamdev.secondskill.common.utils.ScriptUtil;
@@ -38,7 +38,7 @@ public class RedisLimit {
                 return true;
             }
         } catch (Exception e) {
-            log.error("Limit 获取 Jedis 实例失败：", e);
+            log.error("limit 获取 Jedis 实例失败：", e);
         } finally {
             RedisPool.jedisPoolClose(jedis);
         }

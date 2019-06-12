@@ -145,7 +145,7 @@ public class RedisLimit {
                 return true;
             }
         } catch (Exception e) {
-            log.error("Limit 获取 Jedis 实例失败：", e);
+            log.error(limit, e);
         } finally {
             RedisPool.jedisPoolClose(jedis);
         }

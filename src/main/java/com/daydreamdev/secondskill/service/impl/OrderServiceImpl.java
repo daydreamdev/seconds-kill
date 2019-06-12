@@ -1,7 +1,7 @@
 package com.daydreamdev.secondskill.service.impl;
 
-import com.daydreamdev.secondskill.common.RedisKeysConstant;
-import com.daydreamdev.secondskill.common.StockWithRedis.StockWithRedis;
+import com.daydreamdev.secondskill.common.stockWithRedis.RedisKeysConstant;
+import com.daydreamdev.secondskill.common.stockWithRedis.StockWithRedis;
 import com.daydreamdev.secondskill.common.utils.RedisPoolUtil;
 import com.daydreamdev.secondskill.dao.StockOrderMapper;
 import com.daydreamdev.secondskill.pojo.Stock;
@@ -10,8 +10,6 @@ import com.daydreamdev.secondskill.service.api.OrderService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -95,6 +93,11 @@ public class OrderServiceImpl implements OrderService {
         // 乐观锁更新库存和 Redis
         saleStockOptimsticWithRedis(stock);
         int res = createOrder(stock);
+        if (res == 1) {
+            log.info("Kafka 消费 Topic 创建订单成功");
+        } else {
+            log.info("Kafka 消费 Topic 创建订单失败");
+        }
 
         return res;
     }
@@ -128,8 +131,8 @@ public class OrderServiceImpl implements OrderService {
      */
     private void saleStockOptimsticWithRedis(Stock stock) throws Exception {
         int res = stockService.updateStockByOptimistic(stock);
-        if (res == 0){
-            throw new RuntimeException("并发更新库存失败") ;
+        if (res == 0) {
+            throw new RuntimeException("并发更新库存失败");
         }
         // 更新 Redis
         StockWithRedis.updateStockWithRedis(stock);

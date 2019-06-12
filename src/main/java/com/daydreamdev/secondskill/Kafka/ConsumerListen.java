@@ -1,17 +1,14 @@
 package com.daydreamdev.secondskill.Kafka;
 
-import com.alibaba.fastjson.JSON;
 import com.daydreamdev.secondskill.pojo.Stock;
 import com.daydreamdev.secondskill.service.api.OrderService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
@@ -37,11 +34,6 @@ public class ConsumerListen {
         // 反序列化
         Stock stock = gson.fromJson((String) message, Stock.class);
         // 创建订单
-        int res = orderService.consumerTopicToCreateOrderWithKafka(stock);
-        if (res == 1) {
-            log.info("Kafka 消费 Topic 创建订单成功");
-        } else {
-            log.info("Kafka 消费 Topic 创建订单失败");
-        }
+        orderService.consumerTopicToCreateOrderWithKafka(stock);
     }
 }

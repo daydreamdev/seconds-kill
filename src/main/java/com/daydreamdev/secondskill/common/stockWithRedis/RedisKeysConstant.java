@@ -1,4 +1,4 @@
-package com.daydreamdev.secondskill.common;
+package com.daydreamdev.secondskill.common.stockWithRedis;
 
 /**
  * @auther G.Fukang
