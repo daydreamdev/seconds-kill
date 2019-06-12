@@ -7,13 +7,18 @@ import com.daydreamdev.secondskill.dao.StockOrderMapper;
 import com.daydreamdev.secondskill.pojo.Stock;
 import com.daydreamdev.secondskill.pojo.StockOrder;
 import com.daydreamdev.secondskill.service.api.OrderService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @auther G.Fukang
@@ -29,6 +34,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private StockOrderMapper orderMapper;
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Value("${spring.kafka.template.default-topic}")
+    private String kafkaTopic;
+
+    private Gson gson = new GsonBuilder().create();
 
     @Override
     public int delOrderDBBefore() {
@@ -63,6 +76,24 @@ public class OrderServiceImpl implements OrderService {
         // 乐观锁更新库存和Redis
         saleStockOptimsticWithRedis(stock);
         // 创建订单
+        int res = createOrder(stock);
+
+        return res;
+    }
+
+    @Override
+    public void createOrderWithLimitAndRedisAndKafka(int sid) throws Exception {
+        // 校验库存
+        Stock stock = checkStockWithRedis(sid);
+        // 下单请求发送至 kafka，需要序列化 stock
+        kafkaTemplate.send(kafkaTopic, gson.toJson(stock));
+        log.info("消息发送至 Kafka 成功");
+    }
+
+    @Override
+    public int consumerTopicToCreateOrderWithKafka(Stock stock) throws Exception {
+        // 乐观锁更新库存和 Redis
+        saleStockOptimsticWithRedis(stock);
         int res = createOrder(stock);
 
         return res;

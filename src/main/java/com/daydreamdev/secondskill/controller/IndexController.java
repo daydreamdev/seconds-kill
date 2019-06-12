@@ -131,4 +131,21 @@ public class IndexController {
         }
         return res == 1 ? success : error;
     }
+
+    /**
+     * 限流 + Redis 缓存库存 + KafkaTest 异步下单
+     * @param sid
+     */
+    @RequestMapping(value = "createOrderWithLimitAndRedisAndKafka", method = RequestMethod.POST)
+    @ResponseBody
+    public String createOrderWithLimitAndRedisAndKafka(HttpServletRequest request, int sid) {
+        try {
+            if (RedisLimit.limit()) {
+                orderService.createOrderWithLimitAndRedisAndKafka(sid);
+            }
+        } catch (Exception e) {
+            log.error("Exception: " + e);
+        }
+        return "秒杀请求正在处理，排队中";
+    }
 }
