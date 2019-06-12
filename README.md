@@ -29,15 +29,19 @@
 
 代码整体思路参考的 [@crossoverJie](<https://github.com/crossoverJie>)，做了以下几点变动
 
-1. 将 SSM 换成 SpringBoot，开箱即用，更加容易上手，将 Mapper 替换为注解，精简了部分代码
+1. 将 SSM 换成 SpringBoot，开箱即用，替换 Mapper XML 为注解，去掉 Dubbo 和 Zookeeper
 2. 原项目中依赖了开发者自己的开源包 [distributed-redis-tool](<https://github.com/crossoverJie/distributed-redis-tool>)，本项目将用到的限流部分直接集成到代码中
-3. 摒弃了 Dubbo 和 Zookeeper，减少了代码量，也使得新手更加容易上手
-4. 加入缓存预热，在秒杀开始前，将库存信息读到缓存中
-5. 缓存更新逻辑中加入 Redis 事务
+3. 加入缓存预热，在秒杀开始前，将库存信息读到缓存中，并暴露数据库和缓存重置方法便于服务器部署压测
+4. 缓存更新逻辑中加入 Redis 事务，避免脏数据
+5. 将 Kafka-client 替换为 spring-kafka，自动配置，通过 KafkaTemplate 和 Listen 进行消息的生产和消费，采用 Gson 进行 Kafka 消息序列化和反序列化，精简大量代码
 
-### Jmeter 压测并发量变化图
+### Jmeter 压测
 
-// TODO
+>// TODO
+>
+>1. Jemter 测试流程和代码
+>2. 并发量变化图
+>3. 第 5 部分的 Ngxin 配置
 
 ### 0. 基本秒杀逻辑
 
@@ -337,6 +341,65 @@ public static void updateStockWithRedis(Stock stock) {
 
 ### 4. Kafka 异步
 
+服务器的资源是恒定的，你用或者不用它的处理能力都是一样的，所以出现峰值的话，很容易导致忙到处理不过来，闲的时候却又没有什么要处理，因此可以通过削峰来延缓用户请求的发出，让服务端处理变得更加平稳。
+
+项目中采用的是用消息队列 Kafka 来缓冲瞬时流量，将同步的直接调用转成异步的间接推送，中间通过一个队列在一端承接瞬时的流量洪峰，在另一端平滑地将消息推送出去。
+
+![](<https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%BC%93%E5%86%B2.png>)
+
+关于 Kafka 的学习，推荐[朱小厮的博客](<https://juejin.im/user/5baf7ec26fb9a05cff32266e>)和博主的书《深入理解 Kafka：核心设计与实践原理》，向 Kafka 发送消息和从 Kafka 拉取消息需要对消息进行序列化处理，这里采用的是`Gson`框架
+
+```java
+// 向 Kafka 发送消息
+public void createOrderWithLimitAndRedisAndKafka(int sid) throws Exception {
+    // 校验库存
+    Stock stock = checkStockWithRedis(sid);
+    // 下单请求发送至 kafka，需要序列化 stock
+    kafkaTemplate.send(kafkaTopic, gson.toJson(stock));
+    log.info("消息发送至 Kafka 成功");
+}
+// 监听器从 Kafka 拉取消息
+public class ConsumerListen {
+
+    private Gson gson = new GsonBuilder().create();
+
+    @Autowired
+    private OrderService orderService;
+
+    @KafkaListener(topics = "SECONDS-KILL-TOPIC")
+    public void listen(ConsumerRecord<String, String> record) throws Exception {
+        Optional<?> kafkaMessage = Optional.ofNullable(record.value());
+        // Object -> String
+        String message = (String) kafkaMessage.get();
+        // 反序列化
+        Stock stock = gson.fromJson((String) message, Stock.class);
+        // 创建订单
+        orderService.consumerTopicToCreateOrderWithKafka(stock);
+    }
+}
+// Kafka 消费消息执行创建订单业务
+public int consumerTopicToCreateOrderWithKafka(Stock stock) throws Exception {
+    // 乐观锁更新库存和 Redis
+    saleStockOptimsticWithRedis(stock);
+    int res = createOrder(stock);
+    if (res == 1) {
+        log.info("Kafka 消费 Topic 创建订单成功");
+    } else {
+        log.info("Kafka 消费 Topic 创建订单失败");
+    }
+
+    return res;
+}
+```
+
+### 5. Nginx 负载均衡
+
+单台服务器的处理性能是有瓶颈的，当并发量十分大时，无论怎么优化都满足不了需求，这时候就需要增加一台服务器分担原有服务器的访问压力，通过负载均衡服务器 Nginx 可以将来自用户的访问请求发到应用服务器集群中的任何一台机器
+
+Nginx 配置如下
+
+// TODO
+
 ##  数据库建表
 
 ```mysql
@@ -364,3 +427,4 @@ CREATE TABLE `stock_order` (
 >- [秒杀系统优化方案（下）吐血整理](<https://www.cnblogs.com/xiangkejin/p/9351501.html>)
 >- [电商网站秒杀与抢购的系统架构](http://www.codeceo.com/article/spike-system-artch.html)
 >- [使用缓存的正确姿势](<https://juejin.im/post/5af5b2c36fb9a07ac65318bd#heading-11>)
+>- [SpringBoot Kafka 整合使用](<https://zhuanlan.zhihu.com/p/32780164>)
