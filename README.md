@@ -37,11 +37,10 @@
 
 ### Jmeter 压测
 
->// TODO
->
+![](<https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/Jmeter%20%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%20TPS.png>)
+
 >1. Jemter 测试流程和代码
->2. 并发量变化图
->3. 第 5 部分的 Ngxin 配置
+>2. 第 5 部分的 Ngxin 配置
 
 ### 0. 基本秒杀逻辑
 
