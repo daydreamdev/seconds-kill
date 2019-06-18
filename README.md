@@ -412,8 +412,64 @@ public int consumerTopicToCreateOrderWithKafka(Stock stock) throws Exception {
 单台服务器的处理性能是有瓶颈的，当并发量十分大时，无论怎么优化都满足不了需求，这时候就需要增加一台服务器分担原有服务器的访问压力，通过负载均衡服务器 Nginx 可以将来自用户的访问请求发到应用服务器集群中的任何一台机器
 
 Nginx 配置如下
+在项目的配置文件 application.properties 中分别设置两个应用的端口号如 8888 和 9999 。
+```
+server.port=8888
+server.port=9999
+```
 
-// TODO
+然后进入nginx/conf文件目录将nginx.conf配置文件的http项部分修改为如下代码：
+```
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    upstream server_miaosha{
+        server 127.0.0.1:8888 weight=1;
+        server 127.0.0.1:9999 weight=1;
+    }
+
+    server {
+        listen  80;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        location / {
+            #root html;
+            #index index.html index.htm;
+            set $xheader $remote_addr;
+            if ( $http_x_forwarded_for != '' ){
+                set $xheader $http_x_forwarded_for;
+            }
+            proxy_set_header X-Real-IP $xheader;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_pass http://server_miaosha;
+        }
+
+        #error_page  404     /404.html;
+```
+权重weight可以根据个人需求进行设置，本文均设置为 1 ，表示两个应用每个一次进行轮询。
 
 ##  数据库建表
 
