@@ -45,21 +45,21 @@
 
 windows 环境下载 zip 安装包，然后将下载的文件进行解压，进入 bin 目录运行 jmeter.bat 即可。
 
-接下来是Jmeter测试计划设置:
+接下来是 Jmeter 测试计划设置:
 
-（1）测试计划上右键新建一个线程组
+（1）在测试计划上右键新建一个线程组
 
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/1.png>)
 
-线程组属性内可以修改线程数、Ramp-Up时间和循环次数。
+线程组属性内可以修改线程数、Ramp-Up 时间和循环次数。
 
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/2.png>)
 
-（2）在线程组上右键添加HTTP请求
+（2）在线程组上右键添加 HTTP 请求
 
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/3.png>)
 
-其属性包括WEB服务器的协议、服务器名称或IP和端口号，HTTP请求的方法和路径。
+其属性包括 WEB 服务器的协议、服务器名称或 IP 和端口号，HTTP 请求的方法和路径。
 
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/4.png>)
 
@@ -71,7 +71,7 @@ windows 环境下载 zip 安装包，然后将下载的文件进行解压，进�
 
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/6.png>)
 
-到此最简单的一个Jmeter测试计划就算添加完了。一个http请求对应一个接口，可以添加多个HTTP请求 以达到多个接口同时检测的需求。
+这样一个简单的 Jmeter 测试计划就算添加完了。一个 HTTP 请求对应一个接口，可以添加多个 HTTP 请求 以达到多个接口同时检测的需求。
 
 ### 0. 基本秒杀逻辑
 
