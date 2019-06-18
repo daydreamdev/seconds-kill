@@ -39,6 +39,8 @@
 
 ![](<https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/Jmeter%20%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%20TPS.png>)
 
+**测试流程如下：**
+
 首先下载 JMeter 安装包  可以去官网下载：http://jmeter.apache.org
 
 windows 环境下载 zip 安装包，然后将下载的文件进行解压，进入 bin 目录运行 jmeter.bat 即可。
