@@ -39,22 +39,30 @@
 
 ![](<https://github.com/gongfukangEE/gongfukangEE.github.io/raw/master/_pic/%E5%88%86%E5%B8%83%E5%BC%8F/Jmeter%20%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%20TPS.png>)
 
->1. Jemter 测试流程
 首先下载 JMeter 安装包  可以去官网下载：http://jmeter.apache.org
 
 windows 环境下载 zip 安装包，然后将下载的文件进行解压，进入 bin 目录运行 jmeter.bat 即可。
 
 接下来是Jmeter测试计划设置:
 
-（1）测试计划上右键新建一个线程组，线程组属性内可以修改线程数、Ramp-Up时间和循环次数。
+（1）测试计划上右键新建一个线程组
+
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/1.png>)
+
+线程组属性内可以修改线程数、Ramp-Up时间和循环次数。
+
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/2.png>)
 
-（2）在线程组上右键添加HTTP请求，其属性包括WEB服务器的协议、服务器名称或IP和端口号，HTTP请求的方法和路径。
+（2）在线程组上右键添加HTTP请求
+
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/3.png>)
+
+其属性包括WEB服务器的协议、服务器名称或IP和端口号，HTTP请求的方法和路径。
+
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/4.png>)
 
 （3）在HTTP请求上右键添加一个监听器，可以根据自己的需求添加汇总报告、查看结果树等等。
+
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/5.png>)
 
 如下图所示为汇总报告，可以查看异常比例和吞吐量，方便调优。
@@ -62,9 +70,6 @@ windows 环境下载 zip 安装包，然后将下载的文件进行解压，进�
 ![](<https://github.com/daydreamdev/MeetingFilm/raw/master/pic/seconds-kill/6.png>)
 
 到此最简单的一个Jmeter测试计划就算添加完了。一个http请求对应一个接口，可以添加多个HTTP请求 以达到多个接口同时检测的需求。
-
-
->2. 第 5 部分的 Ngxin 配置
 
 ### 0. 基本秒杀逻辑
 
